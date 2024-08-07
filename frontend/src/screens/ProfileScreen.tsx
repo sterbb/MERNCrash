@@ -1,46 +1,44 @@
 import {useEffect, useState} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
-import {Form, Button, Row, Col} from 'react-bootstrap';
+import {Form, Button} from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { useRegisterMutation } from '../slices/usersApiSlice';
 import FormContainer from '../components/FormContainer';
 import { setCredentials } from '../slices/authSlices';
 import { Loader } from '../components/Loader';
+import {useUpdateUserMutation} from '../slices/usersApiSlice'
 
 import React from 'react'
 import { toast } from 'react-toastify';
 
 
-const RegisterScreen = () => {
+const ProfileScreen = () => {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const [register, {isLoading}] = useRegisterMutation();
-
   const { userInfo } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  //check if logged in 
+  const [update, {isLoading}] = useUpdateUserMutation();
+
+  //set data from current user logged in
 
   useEffect(()=>{
-    if(userInfo){
-        navigate('/');
-    }
-  },[navigate, userInfo])
+    setName(userInfo.name)
+    setEmail(userInfo.email)
+  },[userInfo.name, userInfo.email])
 
   const submitHandler = async(e:any) =>{
     e.preventDefault();
 
-
     try {
 
         if(password === confirmPassword){
-            const res = await register({name,email,password}).unwrap()
+            const res = await update({_id: userInfo.id, name, email, password}).unwrap();
             dispatch(setCredentials({...res}))
-            toast.success('Registered Successfully')
+            toast.success('Profile updated successfully')
             navigate('/'); 
         }else{
             toast.error('Passwords do not match');
@@ -55,7 +53,7 @@ const RegisterScreen = () => {
 
   return (
     <FormContainer>
-        <h1>Sign Up</h1>    
+        <h1>Update Profile</h1>    
 
         <Form onSubmit={submitHandler}>
 
@@ -85,20 +83,15 @@ const RegisterScreen = () => {
 
             </Form.Group>
 
-            {isLoading && <Loader/>}
 
+            {isLoading && <Loader/>}
             <Button type='submit' variant='primary' className='mt-3'>
-                Sign Up
+                Update
             </Button>
 
-            <Row className="py-3">
-                <Col>
-                    Already have an account? <Link to='/login'>Login</Link>
-                </Col>
-            </Row>
         </Form>
     </FormContainer>
   )
 }
 
-export default RegisterScreen
+export default ProfileScreen

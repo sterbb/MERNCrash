@@ -4,18 +4,26 @@ import { Route, createBrowserRouter,createRoutesFromElements, RouterProvider} fr
 import MainLayout from './layout/MainLayout';
 import LoginScreen from './screens/LoginScreen';
 import RegisterScreen from './screens/RegisterScreen';
+import ProfileScreen from './screens/ProfileScreen';
+import PrivateRoute from './components/PrivateRoute';
 
 
 
 const App = () => {
 
   const router = createBrowserRouter(
-    createRoutesFromElements(
+    createRoutesFromElements( 
       <Route path="/" element={<MainLayout />}>
 
         <Route index element={<HomeScreen />} />
         <Route path="/login" element={<LoginScreen/>} />
         <Route path="/register" element={<RegisterScreen/>} />
+
+        {/*Private Route / Check first if user is logged in */}
+        <Route path="" element={<PrivateRoute/>}>
+          <Route path="/profile" element={<ProfileScreen/>} />
+        </Route>
+   
       </Route>
     )
   )
